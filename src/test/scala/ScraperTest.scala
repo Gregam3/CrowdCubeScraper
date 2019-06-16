@@ -11,5 +11,7 @@ class ScraperTest extends TestCase {
 
   def testIfAllScrape: Unit = assert(scrapeAll.length >= 733)
 
+  def testIfCampaignScrap: Unit = {
 
+  }
 }

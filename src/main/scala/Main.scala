@@ -12,6 +12,9 @@ object Main extends App {
   lazy val TEAM_MEMBERS_RGX = ("<span class=\"cc-company__person\">([\\S\\s]*?)</span>" +
     "[\\S\\s]*?<td>([\\S\\s]*?)</td>").r
   lazy val CAMPAIGN_URI_RGX = "<a href=\"https://www.crowdcube.com/investment/(.*)\">".r
+  lazy val CAMPAIGN_DETAILS_RGX = ("<div class=\"cc-progressBar \">[\\S\\s]*?<span>([\\S\\s]*?)</span>" +
+    "[\\S\\s]*?<dt>[\\S\\s]*?Investors[\\S\\s]*?</dt>[\\S\\s]*?<dd>([\\S\\s]*?)</dd>[\\S\\s]*?" +
+    "Target[\\S\\s]*?</dt>[\\S\\s]*?<dd>([\\S\\s]*?)</dd>").r
   lazy val SLEEP_TIME = 4500
 
   var scrapeCount = 0
@@ -73,8 +76,13 @@ object Main extends App {
     val uris = CAMPAIGN_URI_RGX.findAllIn(html).matchData.toList
       .map(m => m.group(1)).toSet
 
-    uris.map(uri => wc.getPage(s"$BASE_URL/investment/$uri").asInstanceOf[HtmlPage].asXml)
+    val investmentHtmlPgs =
+      uris.map(uri => wc.getPage(s"$BASE_URL/investment/$uri")
+        .asInstanceOf[HtmlPage].asXml)
 
-    null
+    investmentHtmlPgs.flatMap(
+      CAMPAIGN_DETAILS_RGX.findAllIn(_).matchData.toList
+        .map(m => new Campaign(false, frmtContent(m.group(3)),
+          frmtContent(m.group(1)), frmtContent(m.group(2)).toInt)))
   }
 }

@@ -1,2 +1,2 @@
-class Campaign(eis:Boolean, fundingSought: Float, fundingReceivedPercentage: Float,
-               investorCount: Int)
+class Campaign(val eis:Boolean, val fundingSought: String, val fundingReceivedPercentage: String,
+               val investorCount: Int)
